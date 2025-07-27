@@ -1,4 +1,4 @@
-# Audio Recorder & Transcriber Dashboard
+# EchoVista
 
 A desktop app built with Electron that lets you record microphone and system audio, organize your recordings into folders, transcribe audio using the AssemblyAI SDK, and generate clean, formatted notes from your recordings.
 
