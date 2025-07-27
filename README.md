@@ -17,7 +17,7 @@ A desktop app built with Electron that lets you record microphone and system aud
 
    ```bash
    git clone https://github.com/yourusername/your-repo-name.git
-   cd your-repo-name
+   cd EchoVista
    ```
 
 2. Install dependencies:
@@ -79,4 +79,4 @@ Contributions welcome! Feel free to open issues or submit pull requests.
 
 ## License
 
-MIT License © 2025 Your Name
+MIT License © 2025 Raghav Senthilkumar
