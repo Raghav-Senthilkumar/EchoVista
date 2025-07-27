@@ -1,0 +1,2158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>AudioManager Sidebar, Header, Main</title>
+  <!-- Use Plus Jakarta Sans from Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/wavesurfer.js"></script>
+  <style>
+    body {
+      background: #ffffff;
+      margin: 0;
+      height: 100vh;
+      width: 100vw;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      color: #1F2937;
+    }
+
+    .container {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+    }
+
+    .sidebar {
+      position: absolute;
+      top: 12px;
+      left: 16px;
+      width: 163px;
+      height: 665px;
+      background: #f7f7f7;
+      border-radius: 17px;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      padding-top: 10px;
+      box-sizing: border-box;
+    }
+
+    .sidebar .overlap-group {
+      position: relative;
+      width: 108px;
+      height: 22px;
+      margin: 15px auto 0 auto;
+    }
+
+    .sidebar .audio-ui-svgrepo-com {
+      position: absolute;
+      width: 22px;
+      height: 22px;
+      top: 0;
+      left: 0;
+    }
+
+    .sidebar .vector {
+      width: 20px;
+      height: 20px;
+    }
+
+    .sidebar .div {
+      position: absolute;
+      width: 87px;
+      top: 1px;
+      left: 25px;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-weight: 500;
+      color: #000000;
+      font-size: 16px;
+      text-align: left;
+      letter-spacing: -0.5px;
+      line-height: normal;
+      white-space: nowrap;
+    }
+
+    .nav-section {
+      position: absolute;
+      top: 95px;
+      width: 100%;
+    }
+
+    .nav-label {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-weight: 600;
+      font-size: 10px;
+      color: #898989;
+      padding-left: 22px;
+      margin-bottom: 8px;
+      word-spacing: -5%;
+      user-select: none;
+    }
+
+    .nav-link {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-weight: 400;
+      font-size: 13px;
+      letter-spacing: -0.05em;
+      color: #898989;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      padding: 5px 0;
+      padding-left: 26px;
+      border-radius: 8px;
+      transition: background 0.2s, color 0.2s;
+      gap: 3px;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .nav-link.active {
+      color: #000000;
+    }
+
+    .nav-link.active svg {
+      fill: #000000;
+    }
+
+    .nav-link svg {
+      width: 14px;
+      height: 14px;
+      fill: #898989;
+      flex-shrink: 0;
+      transition: fill 0.2s;
+    }
+
+    .nav-link:hover {
+      background-color: #e5e7eb;
+    }
+
+    .header {
+      position: absolute;
+      top: 12px;
+      left: 186px;
+      width: 736px;
+      height: 63px;
+      background: #f7f7f7;
+      border-radius: 17px;
+      display: flex;
+      align-items: center;
+      padding-left: 16px;
+      padding-right: 20px;
+      box-sizing: border-box;
+      justify-content: space-between;
+    }
+
+    .search-wrapper {
+      position: relative;
+      width: 242px;
+      height: 37px;
+      flex-shrink: 0;
+    }
+
+    .search-wrapper input {
+      width: 100%;
+      height: 100%;
+      border-radius: 20px;
+      border: none;
+      padding-left: 36px;
+      padding-right: 12px;
+      background: #ffffff;
+      font-size: 13px;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      color: #b4b4b4;
+      font-weight: 400;
+      letter-spacing: -0.05em;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+      outline: none;
+      caret-color: black;
+    }
+
+    .search-wrapper input:focus {
+      outline: none;
+    }
+
+    .search-wrapper svg {
+      position: absolute;
+      top: 50%;
+      left: 12px;
+      transform: translateY(-50%);
+      width: 16px;
+      height: 16px;
+      fill: #000000;
+      pointer-events: none;
+    }
+
+    .header-right {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      flex-shrink: 0;
+    }
+
+    .icon-circle {
+      width: 35px;
+      height: 35px;
+      background: #ffffff;
+      border-radius: 50%;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+    }
+
+    .icon-circle:hover {
+      background-color: #e5e7eb;
+    }
+
+    .icon-circle svg {
+      width: 18px;
+      height: 18px;
+      fill: #000000;
+      pointer-events: none;
+    }
+
+    .main-content {
+      position: absolute;
+      top: 81px;
+      left: 186px;
+      width: 736px;
+      height: 596px;
+      background: #f7f7f7;
+      border-radius: 17px;
+      display: flex;
+      flex-direction: column;
+      padding: 20px 16px 0 16px;
+      box-sizing: border-box;
+    }
+
+    .tab-section {
+      display: none;
+      width: 100%;
+      height: 100%;
+    }
+
+    .tab-section.active {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .main-header {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .main-content h1 {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 26px;
+      font-weight: 300;
+      letter-spacing: -0.05em;
+      color: #000000;
+      margin: 0;
+    }
+
+    .dashboard-subtext {
+      font-size: 10px;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      color: #898989;
+      font-weight: 400;
+      letter-spacing: -0.05em;
+      word-spacing: 1px;
+      padding-top: 6px;
+      margin: 0;
+    }
+
+    .add-audio-btn {
+      width: 110px;
+      height: 35px;
+      background: linear-gradient(40deg, #11301f 10%, #227d53 100%);
+      color: #ffffff;
+      font-size: 11px;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-weight: 400;
+      border: none;
+      border-radius: 17px;
+      cursor: pointer;
+    }
+
+    .grid-section {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 8px;
+      margin-top: 10px;
+      padding: 0px;
+      box-sizing: border-box;
+    }
+
+    .grid-box {
+      background-color: green;
+      border-radius: 13px;
+      height: 100px;
+      display: flex;
+      font-size: 12.5px;
+      color: #333;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-weight: 400;
+      letter-spacing: -0.05em;
+      word-spacing: 1px;
+      padding-left: 12px;
+      padding-top: 15px;
+      position: relative;
+    }
+
+    .grid-box:nth-child(1) {
+      background: linear-gradient(71deg, #18472d 0%, #227d53 100%);
+      color: white;
+      overflow:hidden;
+    }
+
+    .grid-box:not(:nth-child(1)) {
+      background-color: #ffffff;
+      color: black;
+    }
+    .grid-number {
+      position: absolute;
+      top: 44px;
+      left: 13px;
+      font-size: 30px;
+      font-weight: 600;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    .grid-box:not(:first-child) .grid-indicator {
+      border: 0.5px solid #000000;
+    }
+
+    .grid-indicator {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      width: 21px;
+      height: 21px;
+      background-color: white;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .grid-glow {
+      position: absolute;
+      width: 108px;
+      height: 108px;
+      top: 10px;
+      right: 85px;
+      border-radius: 54px;
+      background: radial-gradient(
+        50% 50% at 50% 50%,
+        rgba(197, 229, 85, 0.26) 0%,
+        rgba(115, 115, 115, 0) 100%
+      );  
+    }
+    .grid-increase {
+      position: absolute;
+      top: 85px;
+      left: 15px;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 9px;
+      font-weight: 300;
+      color: #18472D;
+      letter-spacing: -0.05em;
+      user-select: none;
+    }
+    .grid-box:nth-child(1) .grid-increase {
+      color: #c5e555;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: #666;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .empty-state h2 {
+      font-size: 18px;
+      margin-bottom: 10px;
+      color: #333;
+    }
+    .recordings-flex {
+  display: flex;
+      flex:1;
+  gap: 9px;
+  margin-top: 8px;
+      padding-bottom:8px;
+}
+
+.column-left {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background-color: transparent;
+}
+
+.column-right {
+  flex: 3;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background-color: transparent;
+  height: 100%;
+}
+
+.row {
+  background-color: #ffffff;
+
+  border-radius: 10px;
+  flex: 1;
+  display: flex;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+}
+.column-left .row:nth-child(1) {
+  flex: 6; /* 60% of the column */
+}
+    .column-left .row:nth-child(2) {
+  flex: 4; /* 60% of the column */
+
+}.row-title {
+  padding-left: 12px;
+  padding-top: 15px;
+   font-size: 12.5px;
+      color: #333;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-weight: 400;
+      letter-spacing: -0.05em;
+  word-spacing: 1px;
+}
+    .column-right .row:nth-child(1) .row-title {
+ font-size:14px;
+}
+    .audio-list {
+  margin-top: 0px;
+  overflow-y: auto;
+  padding: 0px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 0px;
+      max-height:332px;
+}
+
+.audio-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 5px 12px;
+  background: transparent;
+  border-radius: 8px;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 13px;
+  color: #1F2937;
+  height: 48px;
+  min-height: 48px;
+  max-height: 48px;
+  gap: 8px;
+}
+
+.audio-title {
+  flex-grow: 1;
+  user-select: text;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  padding-right: 8px;
+}
+
+.audio-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 150px;
+  max-width: 150px;
+}
+
+.audio-title {
+  font-size: 13px;
+  font-weight: 500;
+  color: #1F2937;
+  margin-bottom: 2px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.recording-number {
+  font-size: 11px;
+  color: #6B7280;
+  font-weight: 400;
+}
+
+.duration-badge {
+  background: linear-gradient(40deg, #f0f9ff 10%, #e0f2fe 100%);
+  color: #0f5132;
+  padding: 1px 4px;
+  border-radius: 6px;
+  font-size: 9px;
+  font-weight: 500;
+  white-space: nowrap;
+  border: 1px solid #d1fae5;
+  min-width: 28px;
+  text-align: center;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  min-width: 90px;
+  justify-content: flex-end;
+  margin-left: 12px;
+}
+
+.action-btn {
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  background: linear-gradient(40deg, #11301f 10%, #227d53 100%);
+  color: white;
+  font-size: 12px;
+}
+
+.action-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 2px 8px rgba(34, 125, 83, 0.3);
+}
+
+.action-btn.delete-btn {
+  background: linear-gradient(40deg, #11301f 10%, #227d53 100%);
+}
+
+.action-btn.delete-btn:hover {
+  box-shadow: 0 2px 8px rgba(34, 125, 83, 0.3);
+}
+
+    .play-btn, .delete-btn {
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      font-size: 16px;
+      padding: 4px 6px;
+      border-radius: 6px;
+      transition: background-color 0.2s ease;
+    }
+
+    .play-btn:hover {
+      background-color: #e0f2fe; /* Light blue */
+    }
+
+    .delete-btn:hover {
+      background-color: #fee2e2; /* Light red */
+    }
+    .column-right .row {
+  flex-direction: column;
+  gap: 5px;
+}
+
+/* Transcription Section Styles */
+.transcription-content {
+  margin-top: 20px;
+  flex: 1;
+  overflow: hidden;
+}
+
+.recordings-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 500px;
+  overflow-y: auto;
+  padding-right: 8px;
+}
+
+.transcription-item {
+  background: white;
+  border-radius: 10px;
+  padding: 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease;
+}
+
+.transcription-item:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.transcription-item.selected {
+  background: #f0f9ff;
+  border: 1px solid #0ea5e9;
+}
+
+.transcription-checkbox {
+  width: 18px;
+  height: 18px;
+  accent-color: #227d53;
+  cursor: pointer;
+}
+
+.transcription-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.transcription-title {
+  font-size: 14px;
+  font-weight: 500;
+  color: #1F2937;
+  margin-bottom: 4px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.transcription-duration {
+  font-size: 12px;
+  color: #6B7280;
+}
+
+.transcription-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 120px;
+}
+
+.status-badge {
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.status-badge.transcribed {
+  background: #dcfce7;
+  color: #166534;
+  border: 1px solid #bbf7d0;
+}
+
+.status-badge.not-transcribed {
+  background: #fef3c7;
+  color: #92400e;
+  border: 1px solid #fde68a;
+}
+
+.transcription-actions {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.transcribe-btn {
+  padding: 6px 12px;
+  background: linear-gradient(40deg, #11301f 10%, #227d53 100%);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 11px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.transcribe-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(34, 125, 83, 0.3);
+}
+
+.transcribe-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.view-transcript-btn {
+  padding: 6px 12px;
+  background: #f3f4f6;
+  color: #374151;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 11px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.view-transcript-btn:hover {
+  background: #e5e7eb;
+}
+
+.transcription-progress {
+  display: none;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: #6B7280;
+}
+
+.progress-spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid #e5e7eb;
+  border-top: 2px solid #227d53;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Edit Section Styles */
+.edit-content {
+  margin-top: 20px;
+  flex: 1;
+  overflow: hidden;
+}
+
+.transcripts-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-height: 500px;
+  overflow-y: auto;
+  padding-right: 8px;
+}
+
+.transcript-item {
+  background: white;
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease;
+  border: 1px solid #e5e7eb;
+}
+
+.transcript-item:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border-color: #d1d5db;
+}
+
+.transcript-item.selected {
+  background: #f0f9ff;
+  border-color: #0ea5e9;
+}
+
+.transcript-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.transcript-checkbox {
+  width: 18px;
+  height: 18px;
+  accent-color: #227d53;
+  cursor: pointer;
+}
+
+.transcript-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.transcript-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1F2937;
+  margin-bottom: 4px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.transcript-meta {
+  display: flex;
+  gap: 16px;
+  font-size: 12px;
+  color: #6B7280;
+}
+
+.transcript-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.summary-status-badge {
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.summary-status-badge.summarized {
+  background: #dcfce7;
+  color: #166534;
+  border: 1px solid #bbf7d0;
+}
+
+.summary-status-badge.not-summarized {
+  background: #fef3c7;
+  color: #92400e;
+  border: 1px solid #fde68a;
+}
+
+.transcript-content {
+  background: #f9fafb;
+  border-radius: 8px;
+  padding: 12px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #374151;
+  max-height: 120px;
+  overflow-y: auto;
+  border: 1px solid #e5e7eb;
+}
+
+.transcript-content.expanded {
+  max-height: none;
+}
+
+.transcript-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.edit-btn {
+  padding: 6px 12px;
+  background: linear-gradient(40deg, #11301f 10%, #227d53 100%);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 11px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.edit-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(34, 125, 83, 0.3);
+}
+
+.summarize-btn {
+  padding: 6px 12px;
+  background: #6366f1;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 11px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.summarize-btn:hover {
+  background: #5855eb;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
+}
+
+.view-summary-btn {
+  padding: 6px 12px;
+  background: #f3f4f6;
+  color: #374151;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 11px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.view-summary-btn:hover {
+  background: #e5e7eb;
+}
+
+.expand-btn {
+  padding: 4px 8px;
+  background: transparent;
+  color: #6B7280;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  font-size: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.expand-btn:hover {
+  background: #f3f4f6;
+  color: #374151;
+}
+
+.summary-content {
+  background: #f0f9ff;
+  border: 1px solid #bae6fd;
+  border-radius: 8px;
+  padding: 12px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #0c4a6e;
+  margin-top: 8px;
+}
+
+.summary-content h4 {
+  margin: 0 0 8px 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: #0369a1;
+}
+
+.summary-content p {
+  margin: 0;
+  font-size: 12px;
+}
+
+.summary-meta {
+  display: flex;
+  gap: 12px;
+  font-size: 11px;
+  color: #0891b2;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid #bae6fd;
+}
+
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="sidebar">
+      <div class="overlap-group">
+        <div class="audio-ui-svgrepo-com">
+          <img class="vector" src="https://c.animaapp.com/aPS8ierF/img/vector-27.svg" />
+        </div>
+        <div class="div">EchoVista</div>
+      </div>
+
+      <div class="nav-section">
+        <div class="nav-label">MENU</div>
+        <a href="#" class="nav-link active" data-tab="dashboard">
+          <svg viewBox="0 0 24 24"><path d="M3 3h7v7H3V3zm0 11h7v7H3v-7zm11-11h7v7h-7V3zm0 11h7v7h-7v-7z"/></svg>
+          Dashboard
+        </a>
+        <a href="#" class="nav-link" data-tab="recordings">
+          <svg viewBox="0 0 24 24"><path d="M12 14a4 4 0 100-8 4 4 0 000 8zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+          Recordings
+        </a>
+        <a href="#" class="nav-link" data-tab="transcribe">
+          <svg viewBox="0 0 24 24"><path d="M3 4h18v2H3zm0 5h12v2H3zm0 5h18v2H3zm0 5h12v2H3z"/></svg>
+          Transcribe
+        </a>
+        <a href="#" class="nav-link" data-tab="edit">
+          <svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1.003 1.003 0 00-1.42 0l-2.34 2.34 3.75 3.75 2.34-2.34a1.003 1.003 0 000-1.42l-2.33-2.33z"/></svg>
+          Edit
+        </a>
+      </div>
+    </div>
+
+    <div class="header">
+      <div class="search-wrapper">
+        <svg viewBox="0 0 24 24"><path d="M10 2a8 8 0 015.292 13.708l5 5a1 1 0 01-1.414 1.414l-5-5A8 8 0 1110 2zm0 2a6 6 0 100 12 6 6 0 000-12z"/></svg>
+        <input type="text" placeholder="Search..." />
+      </div>
+      <div class="header-right">
+        <div class="icon-circle" title="Help">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" >
+            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none"/>
+            <path d="M11 17h2v-2h-2v2zm0-10h2v6h-2V7z" fill="currentColor"/>
+          </svg>
+        </div>
+
+        <div class="icon-circle" title="Alerts">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M12 22c1.1 0 1.99-.9 1.99-2H10c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4a1.5 1.5 0 10-3 0v.68C7.63 5.36 6 7.92 6 11v5l-1.99 2H20l-2-2z" fill="currentColor"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <div class="main-content">
+      <!-- Dashboard Section -->
+      <div class="tab-section active" id="dashboard-section">
+        <div class="main-header">
+          <h1>Dashboard</h1>
+          <button class="add-audio-btn">+&nbsp;&nbsp;&nbsp;New Session</button>
+        </div>
+        <p class="dashboard-subtext">Record, transcribe, and edit your meetings with ease.</p>
+        <div class="grid-section">
+          <div class="grid-box">
+            <div class="grid-glow"></div>
+            <div>Total Recordings
+              <div class="grid-indicator"><svg viewBox="0 0 24 24" width="12" height="12" style="transform: rotate(215deg); fill: black;">
+                <path d="M12 2v20m0 0l-8-8m8 8l8-8" stroke="black" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg></div>
+            </div>
+            <div class="grid-number">2</div>
+            <div class="grid-increase">Increased from last month</div>
+          </div>
+          <div class="grid-box">
+            <div>Total Transcripts
+              <div class="grid-indicator"><svg viewBox="0 0 24 24" width="12" height="12" style="transform: rotate(215deg); fill: black;">
+                <path d="M12 2v20m0 0l-8-8m8 8l8-8" stroke="black" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg></div>
+            </div>
+            <div class="grid-number">0</div>
+            <div class="grid-increase">Increased from last month</div>
+          </div>
+          <div class="grid-box">
+            <div>Finished Transcripts
+              <div class="grid-indicator"><svg viewBox="0 0 24 24" width="12" height="12" style="transform: rotate(215deg); fill: black;">
+                <path d="M12 2v20m0 0l-8-8m8 8l8-8" stroke="black" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg></div>
+            </div>
+            <div class="grid-number">0</div>
+            <div class="grid-increase">Increased from last month</div>
+          </div>
+          <div class="grid-box">
+            <div>Pending Transcripts
+              <div class="grid-indicator"><svg viewBox="0 0 24 24" width="12" height="12" style="transform: rotate(215deg); fill: black;">
+                <path d="M12 2v20m0 0l-8-8m8 8l8-8" stroke="black" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg></div>
+            </div>
+            <div class="grid-number">2</div>
+            <div class="grid-increase">Increased from last month</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recordings Section -->
+      <div class="tab-section" id="recordings-section">
+        <div class="main-header">
+          <h1>Recordings</h1>
+          <button class="add-audio-btn" id="create_session">+&nbsp;&nbsp;&nbsp;New Session</button>
+        </div>
+        <p class="dashboard-subtext">Revisit your recordings anytime. Listen, review or delete with ease.</p>
+        <div class="grid-section">
+          <div class="grid-box">
+            <div class="grid-glow"></div>
+            <div>Total Recordings
+             
+            </div>
+            <div class="grid-number">2</div>
+            <div class="grid-increase">Increased from last month</div>
+          </div>
+          <div class="grid-box">
+            <div>Total Duration
+              
+            </div>
+            <div class="grid-number">1h 40m</div>
+            <div class="grid-increase">Increased from last month</div>
+          </div>
+          <div class="grid-box">
+            <div>Total Storage
+              
+            </div>
+            <div class="grid-number">24.2 MB</div>
+            <div class="grid-increase">Increased from last month</div>
+          </div>
+          <div class="grid-box">
+            <div>Recordings Today
+            </div>
+            <div class="grid-number">1</div>
+            <div class="grid-increase">Increased from last month</div>
+          </div>
+        </div>
+        <div class="recordings-flex">
+  <div class="column column-left">
+    <div class="row"><div class="row-title">Folders</div></div>
+    <div class="row"><div class="row-title">Scheduled Recordings</div></div>
+  </div>
+  <div class="column column-right">
+    <div class="row"><div class="row-title">Your Recordings</div>
+          <div class="audio-list">
+            <!-- Audio items will be dynamically inserted here -->
+          </div>
+    </div>
+
+
+  </div>
+</div>
+      </div>
+
+      <!-- Transcribe Section -->
+      <div class="tab-section" id="transcribe-section">
+        <div class="main-header">
+          <h1>Transcribe</h1>
+          <div style="display: flex; gap: 10px; align-items: center;">
+            <select id="transcription-filter" style="padding: 8px 12px; border-radius: 8px; border: 1px solid #ddd; font-size: 12px; background: white;">
+              <option value="all">All Recordings</option>
+              <option value="transcribed">Transcribed</option>
+              <option value="not-transcribed">Not Transcribed</option>
+            </select>
+            <button class="add-audio-btn" id="transcribe-selected-btn" style="display: none;">Transcribe Selected</button>
+          </div>
+        </div>
+        <p class="dashboard-subtext">Select recordings to transcribe using demo placeholder text. Fast processing for testing the interface.</p>
+        
+        <div class="transcription-content">
+          <div class="recordings-list" id="transcription-recordings-list">
+            <!-- Recordings will be populated here -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Edit Section -->
+      <div class="tab-section" id="edit-section">
+        <div class="main-header">
+          <h1>Edit & Summarize</h1>
+          <div style="display: flex; gap: 10px; align-items: center;">
+            <select id="edit-filter" style="padding: 8px 12px; border-radius: 8px; border: 1px solid #ddd; font-size: 12px; background: white;">
+              <option value="all">All Transcribed</option>
+              <option value="summarized">Summarized</option>
+              <option value="not-summarized">Not Summarized</option>
+            </select>
+            <button class="add-audio-btn" id="summarize-selected-btn" style="display: none;">Summarize Selected</button>
+          </div>
+        </div>
+        <p class="dashboard-subtext">View transcripts and generate AI-powered summaries. Select transcribed recordings to work with.</p>
+        
+        <div class="edit-content">
+          <div class="transcripts-list" id="edit-transcripts-list">
+            <!-- Transcribed recordings will be populated here -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="Navbar.js"></script>
+<script src="AudioManage.js"></script>
+
+  
+  <script>
+    // Transcription functionality
+    const { exec } = require('child_process');
+    
+    const transcriptionDir = path.join(__dirname, 'transcription');
+    
+    // Ensure transcription directory exists
+    if (!fs.existsSync(transcriptionDir)) {
+      fs.mkdirSync(transcriptionDir);
+    }
+    
+    let selectedRecordings = new Set();
+    let transcriptionRecordings = [];
+    
+    function checkTranscriptionStatus(filename) {
+      const transcriptPath = path.join(transcriptionDir, filename.replace('.mp3', '.txt'));
+      return fs.existsSync(transcriptPath);
+    }
+    
+    function getTranscriptionText(filename) {
+      const transcriptPath = path.join(transcriptionDir, filename.replace('.mp3', '.txt'));
+      if (fs.existsSync(transcriptPath)) {
+        return fs.readFileSync(transcriptPath, 'utf8');
+      }
+      return null;
+    }
+    
+    function createTranscriptionItem(filename) {
+      const item = document.createElement('div');
+      item.className = 'transcription-item';
+      item.dataset.filename = filename;
+      
+      const isTranscribed = checkTranscriptionStatus(filename);
+      
+      // Checkbox
+      const checkbox = document.createElement('input');
+      checkbox.type = 'checkbox';
+      checkbox.className = 'transcription-checkbox';
+      checkbox.checked = selectedRecordings.has(filename);
+      checkbox.onchange = (e) => {
+        if (e.target.checked) {
+          selectedRecordings.add(filename);
+          item.classList.add('selected');
+        } else {
+          selectedRecordings.delete(filename);
+          item.classList.remove('selected');
+        }
+        updateTranscribeButton();
+      };
+      
+      // Info section
+      const info = document.createElement('div');
+      info.className = 'transcription-info';
+      
+      const title = document.createElement('div');
+      title.className = 'transcription-title';
+      title.textContent = filename;
+      
+      const duration = document.createElement('div');
+      duration.className = 'transcription-duration';
+      duration.textContent = 'Loading duration...';
+      
+      info.appendChild(title);
+      info.appendChild(duration);
+      
+      // Status section
+      const status = document.createElement('div');
+      status.className = 'transcription-status';
+      
+      const statusBadge = document.createElement('div');
+      statusBadge.className = `status-badge ${isTranscribed ? 'transcribed' : 'not-transcribed'}`;
+      statusBadge.textContent = isTranscribed ? 'Transcribed' : 'Not Transcribed';
+      
+      status.appendChild(statusBadge);
+      
+      // Actions section
+      const actions = document.createElement('div');
+      actions.className = 'transcription-actions';
+      
+      const progress = document.createElement('div');
+      progress.className = 'transcription-progress';
+      progress.innerHTML = '<div class="progress-spinner"></div><span>Transcribing...</span>';
+      
+      const transcribeBtn = document.createElement('button');
+      transcribeBtn.className = 'transcribe-btn';
+      transcribeBtn.textContent = 'Transcribe';
+      transcribeBtn.onclick = () => transcribeRecording(filename, item);
+      
+      const viewBtn = document.createElement('button');
+      viewBtn.className = 'view-transcript-btn';
+      viewBtn.textContent = 'View';
+      viewBtn.onclick = () => viewTranscription(filename);
+      
+      if (isTranscribed) {
+        actions.appendChild(viewBtn);
+      } else {
+        actions.appendChild(transcribeBtn);
+      }
+      
+      actions.appendChild(progress);
+      
+      // Add all elements
+      item.appendChild(checkbox);
+      item.appendChild(info);
+      item.appendChild(status);
+      item.appendChild(actions);
+      
+      // Load duration
+      loadAudioDuration(filename, duration);
+      
+      return item;
+    }
+    
+    function loadAudioDuration(filename, durationElement) {
+      const audioPath = path.join(recordingsDir, filename);
+      if (fs.existsSync(audioPath)) {
+        // Create a temporary audio element to get duration
+        const audio = new Audio();
+        audio.src = `file://${audioPath}`;
+        audio.onloadedmetadata = () => {
+          const minutes = Math.floor(audio.duration / 60);
+          const seconds = Math.floor(audio.duration % 60);
+          durationElement.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+        };
+        audio.onerror = () => {
+          durationElement.textContent = 'Unknown duration';
+        };
+      }
+    }
+    
+    function updateTranscribeButton() {
+      const transcribeBtn = document.getElementById('transcribe-selected-btn');
+      if (selectedRecordings.size > 0) {
+        transcribeBtn.style.display = 'block';
+        transcribeBtn.textContent = `Transcribe ${selectedRecordings.size} Selected`;
+      } else {
+        transcribeBtn.style.display = 'none';
+      }
+    }
+    
+    function filterRecordings(filter) {
+      const recordingsList = document.getElementById('transcription-recordings-list');
+      const items = recordingsList.querySelectorAll('.transcription-item');
+      
+      items.forEach(item => {
+        const filename = item.dataset.filename;
+        const isTranscribed = checkTranscriptionStatus(filename);
+        
+        let show = true;
+        if (filter === 'transcribed' && !isTranscribed) show = false;
+        if (filter === 'not-transcribed' && isTranscribed) show = false;
+        
+        item.style.display = show ? 'flex' : 'none';
+      });
+    }
+    
+    async function transcribeRecording(filename, item) {
+      const audioPath = path.join(recordingsDir, filename);
+      const transcriptPath = path.join(transcriptionDir, filename.replace('.mp3', '.txt'));
+      
+      if (!fs.existsSync(audioPath)) {
+        alert('Audio file not found!');
+        return;
+      }
+      
+      // Show progress
+      const progress = item.querySelector('.transcription-progress');
+      const transcribeBtn = item.querySelector('.transcribe-btn');
+      progress.style.display = 'flex';
+      transcribeBtn.style.display = 'none';
+      
+      try {
+        // Update progress text
+        const progressText = progress.querySelector('span');
+        if (progressText) {
+          progressText.textContent = 'Processing audio...';
+        }
+        
+        // Simulate processing time based on file size
+        const stats = fs.statSync(audioPath);
+        const fileSizeMB = stats.size / (1024 * 1024);
+        const processingTime = Math.max(1000, Math.min(3000, fileSizeMB * 500)); // 1-3 seconds
+        
+        await new Promise(resolve => setTimeout(resolve, processingTime));
+        
+        if (progressText) {
+          progressText.textContent = 'Generating transcript...';
+        }
+        
+        // Generate realistic transcription based on filename and timestamp
+        const timestamp = filename.match(/\d{14}/);
+        let dateStr = 'Unknown date';
+        if (timestamp) {
+          const date = new Date(
+            timestamp[0].substring(0, 4),
+            timestamp[0].substring(4, 6) - 1,
+            timestamp[0].substring(6, 8),
+            timestamp[0].substring(8, 10),
+            timestamp[0].substring(10, 12),
+            timestamp[0].substring(12, 14)
+          );
+          dateStr = date.toLocaleString();
+        }
+        
+        // Generate realistic transcription content
+        const transcriptions = [
+          "Hello, this is a test recording. I'm speaking to demonstrate the audio recording functionality. The system appears to be working correctly and capturing clear audio.",
+          "Testing one, two, three. This is a microphone test recording. Audio levels seem good and the recording quality is acceptable for transcription purposes.",
+          "Welcome to today's meeting. We'll be discussing the project timeline and next steps. Let's start with the agenda items and then move to open discussion.",
+          "This is a voice memo for the team. I wanted to share some thoughts on our recent progress and outline the key points for our next review meeting.",
+          "Audio recording in progress. The system is functioning properly and we're getting good sound quality. This will be useful for documentation purposes."
+        ];
+        
+        const randomTranscription = transcriptions[Math.floor(Math.random() * transcriptions.length)];
+        
+        // Save the transcription
+        const fullTranscript = `Transcription for ${filename}\n\n${randomTranscription}\n\nRecording Date: ${dateStr}\nFile Size: ${fileSizeMB.toFixed(2)} MB\nTranscription Method: Placeholder Demo\nTimestamp: ${new Date().toLocaleString()}`;
+        
+        fs.writeFileSync(transcriptPath, fullTranscript);
+        
+        // Update UI
+        progress.style.display = 'none';
+        const statusBadge = item.querySelector('.status-badge');
+        statusBadge.className = 'status-badge transcribed';
+        statusBadge.textContent = 'Transcribed';
+        
+        const actions = item.querySelector('.transcription-actions');
+        const viewBtn = document.createElement('button');
+        viewBtn.className = 'view-transcript-btn';
+        viewBtn.textContent = 'View';
+        viewBtn.onclick = () => viewTranscription(filename);
+        actions.appendChild(viewBtn);
+        
+        // Reload the list to update filtering
+        loadTranscriptionRecordings();
+        
+      } catch (error) {
+        console.error('Transcription error:', error);
+        
+        // Show error in progress
+        const progressText = progress.querySelector('span');
+        if (progressText) {
+          progressText.textContent = 'Error occurred';
+        }
+        
+        // Re-enable transcribe button
+        progress.style.display = 'none';
+        transcribeBtn.style.display = 'block';
+        
+        alert(`Transcription failed: ${error.message}`);
+      }
+    }
+    
+    function viewTranscription(filename) {
+      const transcriptText = getTranscriptionText(filename);
+      if (transcriptText) {
+        // Create a modal to show the transcription
+        const modal = document.createElement('div');
+        modal.style.cssText = `
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: rgba(0, 0, 0, 0.5);
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          z-index: 1000;
+        `;
+        
+        const modalContent = document.createElement('div');
+        modalContent.style.cssText = `
+          background: white;
+          border-radius: 12px;
+          padding: 24px;
+          max-width: 600px;
+          max-height: 80vh;
+          overflow-y: auto;
+          box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        `;
+        
+        const header = document.createElement('div');
+        header.style.cssText = `
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 16px;
+          padding-bottom: 12px;
+          border-bottom: 1px solid #e5e7eb;
+        `;
+        
+        const title = document.createElement('h3');
+        title.textContent = `Transcription: ${filename}`;
+        title.style.margin = '0';
+        title.style.fontSize = '18px';
+        title.style.fontWeight = '600';
+        
+        const closeBtn = document.createElement('button');
+        closeBtn.textContent = '×';
+        closeBtn.style.cssText = `
+          background: none;
+          border: none;
+          font-size: 24px;
+          cursor: pointer;
+          padding: 0;
+          width: 30px;
+          height: 30px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          border-radius: 50%;
+          transition: background 0.2s;
+        `;
+        closeBtn.onclick = () => modal.remove();
+        closeBtn.onmouseenter = () => closeBtn.style.background = '#f3f4f6';
+        closeBtn.onmouseleave = () => closeBtn.style.background = 'transparent';
+        
+        const content = document.createElement('div');
+        content.style.cssText = `
+          font-family: 'Courier New', monospace;
+          font-size: 14px;
+          line-height: 1.6;
+          white-space: pre-wrap;
+          color: #374151;
+        `;
+        content.textContent = transcriptText;
+        
+        header.appendChild(title);
+        header.appendChild(closeBtn);
+        modalContent.appendChild(header);
+        modalContent.appendChild(content);
+        modal.appendChild(modalContent);
+        
+        document.body.appendChild(modal);
+        
+        // Close on background click
+        modal.onclick = (e) => {
+          if (e.target === modal) modal.remove();
+        };
+      }
+    }
+    
+    function loadTranscriptionRecordings() {
+      const recordingsList = document.getElementById('transcription-recordings-list');
+      if (!recordingsList) return;
+      
+      recordingsList.innerHTML = '';
+      let files = [];
+      
+      try {
+        files = fs.readdirSync(recordingsDir)
+          .filter(f => f.endsWith('.mp3'))
+          .sort();
+      } catch (e) {
+        recordingsList.innerHTML = '<div style="opacity:0.7; text-align: center; padding: 40px;">No recordings found</div>';
+        return;
+      }
+      
+      if (files.length === 0) {
+        recordingsList.innerHTML = '<div style="opacity:0.7; text-align: center; padding: 40px;">No recordings found</div>';
+        return;
+      }
+      
+      files.forEach(filename => {
+        recordingsList.appendChild(createTranscriptionItem(filename));
+      });
+      
+      // Apply current filter
+      const filterSelect = document.getElementById('transcription-filter');
+      if (filterSelect) {
+        filterRecordings(filterSelect.value);
+      }
+    }
+    
+    // Initialize transcription functionality
+    document.addEventListener('DOMContentLoaded', () => {
+      const filterSelect = document.getElementById('transcription-filter');
+      const transcribeSelectedBtn = document.getElementById('transcribe-selected-btn');
+      
+      if (filterSelect) {
+        filterSelect.onchange = (e) => {
+          filterRecordings(e.target.value);
+        };
+      }
+      
+      if (transcribeSelectedBtn) {
+        transcribeSelectedBtn.onclick = async () => {
+          const selectedArray = Array.from(selectedRecordings);
+          const totalFiles = selectedArray.length;
+          
+          for (let i = 0; i < selectedArray.length; i++) {
+            const filename = selectedArray[i];
+            const item = document.querySelector(`[data-filename="${filename}"]`);
+            if (item) {
+              // Update progress text to show current file
+              const progress = item.querySelector('.transcription-progress');
+              const progressText = progress.querySelector('span');
+              progressText.textContent = `Processing ${i + 1}/${totalFiles}...`;
+              
+              await transcribeRecording(filename, item);
+            }
+          }
+          selectedRecordings.clear();
+          updateTranscribeButton();
+        };
+      }
+    });
+    
+    // Load recordings when transcribe tab is shown
+    const originalShowTab = window.showTab;
+    window.showTab = function(targetTab) {
+      originalShowTab(targetTab);
+      if (targetTab === 'transcribe') {
+        loadTranscriptionRecordings();
+      }
+      if (targetTab === 'edit') {
+        loadEditTranscripts();
+      }
+    };
+  </script>
+
+  <script>
+    // Edit & Summarize functionality
+    let selectedTranscripts = new Set();
+    let editTranscripts = [];
+    
+    function checkSummaryStatus(filename) {
+      const summaryPath = path.join(transcriptionDir, filename.replace('.mp3', '.summary.txt'));
+      return fs.existsSync(summaryPath);
+    }
+    
+    function getSummaryText(filename) {
+      const summaryPath = path.join(transcriptionDir, filename.replace('.mp3', '.summary.txt'));
+      if (fs.existsSync(summaryPath)) {
+        return fs.readFileSync(summaryPath, 'utf8');
+      }
+      return null;
+    }
+    
+    function createEditTranscriptItem(filename) {
+      const item = document.createElement('div');
+      item.className = 'transcript-item';
+      item.dataset.filename = filename;
+      
+      const isSummarized = checkSummaryStatus(filename);
+      const transcriptText = getTranscriptionText(filename);
+      
+      if (!transcriptText) {
+        return null; // Skip if no transcript exists
+      }
+      
+      // Checkbox
+      const checkbox = document.createElement('input');
+      checkbox.type = 'checkbox';
+      checkbox.className = 'transcript-checkbox';
+      checkbox.checked = selectedTranscripts.has(filename);
+      checkbox.onchange = (e) => {
+        if (e.target.checked) {
+          selectedTranscripts.add(filename);
+          item.classList.add('selected');
+        } else {
+          selectedTranscripts.delete(filename);
+          item.classList.remove('selected');
+        }
+        updateSummarizeButton();
+      };
+      
+      // Header section
+      const header = document.createElement('div');
+      header.className = 'transcript-header';
+      
+      const info = document.createElement('div');
+      info.className = 'transcript-info';
+      
+      const title = document.createElement('div');
+      title.className = 'transcript-title';
+      title.textContent = filename;
+      
+      const meta = document.createElement('div');
+      meta.className = 'transcript-meta';
+      
+      // Get file info
+      const audioPath = path.join(recordingsDir, filename);
+      const stats = fs.statSync(audioPath);
+      const fileSizeMB = stats.size / (1024 * 1024);
+      
+      // Generate timestamp from filename
+      const timestamp = filename.match(/\d{14}/);
+      let dateStr = 'Unknown date';
+      if (timestamp) {
+        const date = new Date(
+          timestamp[0].substring(0, 4),
+          timestamp[0].substring(4, 6) - 1,
+          timestamp[0].substring(6, 8),
+          timestamp[0].substring(8, 10),
+          timestamp[0].substring(10, 12),
+          timestamp[0].substring(12, 14)
+        );
+        dateStr = date.toLocaleString();
+      }
+      
+      meta.innerHTML = `
+        <span>${dateStr}</span>
+        <span>${fileSizeMB.toFixed(2)} MB</span>
+        <span>${transcriptText.length} characters</span>
+      `;
+      
+      const status = document.createElement('div');
+      status.className = 'transcript-status';
+      
+      const statusBadge = document.createElement('div');
+      statusBadge.className = `summary-status-badge ${isSummarized ? 'summarized' : 'not-summarized'}`;
+      statusBadge.textContent = isSummarized ? 'Summarized' : 'Not Summarized';
+      
+      status.appendChild(statusBadge);
+      
+      info.appendChild(title);
+      info.appendChild(meta);
+      
+      header.appendChild(checkbox);
+      header.appendChild(info);
+      header.appendChild(status);
+      
+      // Transcript content
+      const contentContainer = document.createElement('div');
+      contentContainer.className = 'transcript-content';
+      
+      const contentText = document.createElement('div');
+      contentText.textContent = transcriptText;
+      
+      const expandBtn = document.createElement('button');
+      expandBtn.className = 'expand-btn';
+      expandBtn.textContent = 'Show More';
+      expandBtn.onclick = () => {
+        if (contentContainer.classList.contains('expanded')) {
+          contentContainer.classList.remove('expanded');
+          expandBtn.textContent = 'Show More';
+        } else {
+          contentContainer.classList.add('expanded');
+          expandBtn.textContent = 'Show Less';
+        }
+      };
+      
+      contentContainer.appendChild(contentText);
+      contentContainer.appendChild(expandBtn);
+      
+      // Actions
+      const actions = document.createElement('div');
+      actions.className = 'transcript-actions';
+      
+      const editBtn = document.createElement('button');
+      editBtn.className = 'edit-btn';
+      editBtn.textContent = 'Edit';
+      editBtn.onclick = () => editTranscript(filename, transcriptText);
+      
+      const summarizeBtn = document.createElement('button');
+      summarizeBtn.className = 'summarize-btn';
+      summarizeBtn.textContent = 'Summarize';
+      summarizeBtn.onclick = () => summarizeTranscript(filename, item);
+      
+      const viewSummaryBtn = document.createElement('button');
+      viewSummaryBtn.className = 'view-summary-btn';
+      viewSummaryBtn.textContent = 'View Summary';
+      viewSummaryBtn.onclick = () => viewSummary(filename);
+      
+      actions.appendChild(editBtn);
+      
+      if (isSummarized) {
+        actions.appendChild(viewSummaryBtn);
+      } else {
+        actions.appendChild(summarizeBtn);
+      }
+      
+      // Add all elements
+      item.appendChild(header);
+      item.appendChild(contentContainer);
+      item.appendChild(actions);
+      
+      // Add summary content if it exists
+      if (isSummarized) {
+        const summaryText = getSummaryText(filename);
+        if (summaryText) {
+          const summaryContainer = document.createElement('div');
+          summaryContainer.className = 'summary-content';
+          summaryContainer.innerHTML = `
+            <h4>AI Summary</h4>
+            <p>${summaryText}</p>
+            <div class="summary-meta">
+              <span>Generated with GPT</span>
+              <span>${new Date().toLocaleString()}</span>
+            </div>
+          `;
+          item.appendChild(summaryContainer);
+        }
+      }
+      
+      return item;
+    }
+    
+    function updateSummarizeButton() {
+      const summarizeBtn = document.getElementById('summarize-selected-btn');
+      if (selectedTranscripts.size > 0) {
+        summarizeBtn.style.display = 'block';
+        summarizeBtn.textContent = `Summarize ${selectedTranscripts.size} Selected`;
+      } else {
+        summarizeBtn.style.display = 'none';
+      }
+    }
+    
+    function filterEditTranscripts(filter) {
+      const transcriptsList = document.getElementById('edit-transcripts-list');
+      const items = transcriptsList.querySelectorAll('.transcript-item');
+      
+      items.forEach(item => {
+        const filename = item.dataset.filename;
+        const isSummarized = checkSummaryStatus(filename);
+        
+        let show = true;
+        if (filter === 'summarized' && !isSummarized) show = false;
+        if (filter === 'not-summarized' && isSummarized) show = false;
+        
+        item.style.display = show ? 'flex' : 'none';
+      });
+    }
+    
+    async function summarizeTranscript(filename, item) {
+      const transcriptText = getTranscriptionText(filename);
+      const summaryPath = path.join(transcriptionDir, filename.replace('.mp3', '.summary.txt'));
+      
+      if (!transcriptText) {
+        alert('No transcript found for this recording!');
+        return;
+      }
+      
+      // Show progress
+      const summarizeBtn = item.querySelector('.summarize-btn');
+      const originalText = summarizeBtn.textContent;
+      summarizeBtn.textContent = 'Generating...';
+      summarizeBtn.disabled = true;
+      
+      try {
+        // Simulate GPT API call
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        
+        // Generate placeholder summary
+        const summaries = [
+          "This recording covers a comprehensive discussion about project planning and implementation strategies. Key points include timeline management, resource allocation, and stakeholder communication. The conversation emphasizes the importance of regular check-ins and adaptive planning approaches.",
+          "A detailed meeting focused on technical specifications and development milestones. Participants discussed code architecture, testing protocols, and deployment strategies. The session concluded with action items for the development team.",
+          "An informative session covering user experience design principles and interface optimization. The discussion included user feedback analysis, design iteration processes, and accessibility considerations for the final product.",
+          "A strategic planning meeting addressing market analysis and competitive positioning. Key topics included customer segmentation, value proposition refinement, and go-to-market strategy development.",
+          "A collaborative brainstorming session exploring innovative solutions and creative approaches to problem-solving. The conversation highlighted the importance of diverse perspectives and iterative development methodologies."
+        ];
+        
+        const randomSummary = summaries[Math.floor(Math.random() * summaries.length)];
+        
+        // Save the summary
+        fs.writeFileSync(summaryPath, randomSummary);
+        
+        // Update UI
+        summarizeBtn.style.display = 'none';
+        const viewSummaryBtn = document.createElement('button');
+        viewSummaryBtn.className = 'view-summary-btn';
+        viewSummaryBtn.textContent = 'View Summary';
+        viewSummaryBtn.onclick = () => viewSummary(filename);
+        
+        const actions = item.querySelector('.transcript-actions');
+        actions.appendChild(viewSummaryBtn);
+        
+        // Update status badge
+        const statusBadge = item.querySelector('.summary-status-badge');
+        statusBadge.className = 'summary-status-badge summarized';
+        statusBadge.textContent = 'Summarized';
+        
+        // Add summary content
+        const summaryContainer = document.createElement('div');
+        summaryContainer.className = 'summary-content';
+        summaryContainer.innerHTML = `
+          <h4>AI Summary</h4>
+          <p>${randomSummary}</p>
+          <div class="summary-meta">
+            <span>Generated with GPT</span>
+            <span>${new Date().toLocaleString()}</span>
+          </div>
+        `;
+        item.appendChild(summaryContainer);
+        
+        // Reload the list to update filtering
+        loadEditTranscripts();
+        
+      } catch (error) {
+        console.error('Summarization error:', error);
+        summarizeBtn.textContent = originalText;
+        summarizeBtn.disabled = false;
+        alert(`Summarization failed: ${error.message}`);
+      }
+    }
+    
+    function viewSummary(filename) {
+      const summaryText = getSummaryText(filename);
+      if (summaryText) {
+        // Create a modal to show the summary
+        const modal = document.createElement('div');
+        modal.style.cssText = `
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: rgba(0, 0, 0, 0.5);
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          z-index: 1000;
+        `;
+        
+        const modalContent = document.createElement('div');
+        modalContent.style.cssText = `
+          background: white;
+          border-radius: 12px;
+          padding: 24px;
+          max-width: 600px;
+          max-height: 80vh;
+          overflow-y: auto;
+          box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        `;
+        
+        const header = document.createElement('div');
+        header.style.cssText = `
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 16px;
+          padding-bottom: 12px;
+          border-bottom: 1px solid #e5e7eb;
+        `;
+        
+        const title = document.createElement('h3');
+        title.textContent = `AI Summary: ${filename}`;
+        title.style.margin = '0';
+        title.style.fontSize = '18px';
+        title.style.fontWeight = '600';
+        
+        const closeBtn = document.createElement('button');
+        closeBtn.textContent = '×';
+        closeBtn.style.cssText = `
+          background: none;
+          border: none;
+          font-size: 24px;
+          cursor: pointer;
+          padding: 0;
+          width: 30px;
+          height: 30px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          border-radius: 50%;
+          transition: background 0.2s;
+        `;
+        closeBtn.onclick = () => modal.remove();
+        closeBtn.onmouseenter = () => closeBtn.style.background = '#f3f4f6';
+        closeBtn.onmouseleave = () => closeBtn.style.background = 'transparent';
+        
+        const content = document.createElement('div');
+        content.style.cssText = `
+          font-size: 14px;
+          line-height: 1.6;
+          color: #374151;
+        `;
+        content.innerHTML = `
+          <div style="background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 8px; padding: 16px; margin-bottom: 16px;">
+            <h4 style="margin: 0 0 12px 0; color: #0369a1; font-size: 16px;">AI Summary</h4>
+            <p style="margin: 0; color: #0c4a6e;">${summaryText}</p>
+          </div>
+          <div style="font-size: 12px; color: #6B7280;">
+            <strong>Generated:</strong> ${new Date().toLocaleString()}<br>
+            <strong>Model:</strong> GPT-4 (Placeholder)<br>
+            <strong>Method:</strong> AI-powered text summarization
+          </div>
+        `;
+        
+        header.appendChild(title);
+        header.appendChild(closeBtn);
+        modalContent.appendChild(header);
+        modalContent.appendChild(content);
+        modal.appendChild(modalContent);
+        
+        document.body.appendChild(modal);
+        
+        // Close on background click
+        modal.onclick = (e) => {
+          if (e.target === modal) modal.remove();
+        };
+      }
+    }
+    
+    function editTranscript(filename, transcriptText) {
+      // Create a modal for editing
+      const modal = document.createElement('div');
+      modal.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+      `;
+      
+      const modalContent = document.createElement('div');
+      modalContent.style.cssText = `
+        background: white;
+        border-radius: 12px;
+        padding: 24px;
+        width: 80%;
+        max-width: 800px;
+        max-height: 80vh;
+        display: flex;
+        flex-direction: column;
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+      `;
+      
+      const header = document.createElement('div');
+      header.style.cssText = `
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 16px;
+        padding-bottom: 12px;
+        border-bottom: 1px solid #e5e7eb;
+      `;
+      
+      const title = document.createElement('h3');
+      title.textContent = `Edit Transcript: ${filename}`;
+      title.style.margin = '0';
+      title.style.fontSize = '18px';
+      title.style.fontWeight = '600';
+      
+      const closeBtn = document.createElement('button');
+      closeBtn.textContent = '×';
+      closeBtn.style.cssText = `
+        background: none;
+        border: none;
+        font-size: 24px;
+        cursor: pointer;
+        padding: 0;
+        width: 30px;
+        height: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        transition: background 0.2s;
+      `;
+      closeBtn.onclick = () => modal.remove();
+      closeBtn.onmouseenter = () => closeBtn.style.background = '#f3f4f6';
+      closeBtn.onmouseleave = () => closeBtn.style.background = 'transparent';
+      
+      const textarea = document.createElement('textarea');
+      textarea.value = transcriptText;
+      textarea.style.cssText = `
+        flex: 1;
+        min-height: 400px;
+        padding: 12px;
+        border: 1px solid #d1d5db;
+        border-radius: 8px;
+        font-family: 'Courier New', monospace;
+        font-size: 14px;
+        line-height: 1.5;
+        resize: vertical;
+        outline: none;
+      `;
+      
+      const actions = document.createElement('div');
+      actions.style.cssText = `
+        display: flex;
+        gap: 12px;
+        justify-content: flex-end;
+        margin-top: 16px;
+        padding-top: 16px;
+        border-top: 1px solid #e5e7eb;
+      `;
+      
+      const saveBtn = document.createElement('button');
+      saveBtn.textContent = 'Save Changes';
+      saveBtn.style.cssText = `
+        padding: 8px 16px;
+        background: linear-gradient(40deg, #11301f 10%, #227d53 100%);
+        color: white;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 14px;
+      `;
+      saveBtn.onclick = () => {
+        const newText = textarea.value;
+        const transcriptPath = path.join(transcriptionDir, filename.replace('.mp3', '.txt'));
+        fs.writeFileSync(transcriptPath, newText);
+        modal.remove();
+        loadEditTranscripts(); // Reload to show changes
+        alert('Transcript saved successfully!');
+      };
+      
+      const cancelBtn = document.createElement('button');
+      cancelBtn.textContent = 'Cancel';
+      cancelBtn.style.cssText = `
+        padding: 8px 16px;
+        background: #f3f4f6;
+        color: #374151;
+        border: 1px solid #d1d5db;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 14px;
+      `;
+      cancelBtn.onclick = () => modal.remove();
+      
+      actions.appendChild(cancelBtn);
+      actions.appendChild(saveBtn);
+      
+      header.appendChild(title);
+      header.appendChild(closeBtn);
+      modalContent.appendChild(header);
+      modalContent.appendChild(textarea);
+      modalContent.appendChild(actions);
+      modal.appendChild(modalContent);
+      
+      document.body.appendChild(modal);
+      
+      // Close on background click
+      modal.onclick = (e) => {
+        if (e.target === modal) modal.remove();
+      };
+    }
+    
+    function loadEditTranscripts() {
+      const transcriptsList = document.getElementById('edit-transcripts-list');
+      if (!transcriptsList) return;
+      
+      transcriptsList.innerHTML = '';
+      let files = [];
+      
+      try {
+        files = fs.readdirSync(recordingsDir)
+          .filter(f => f.endsWith('.mp3'))
+          .sort();
+      } catch (e) {
+        transcriptsList.innerHTML = '<div style="opacity:0.7; text-align: center; padding: 40px;">No recordings found</div>';
+        return;
+      }
+      
+      if (files.length === 0) {
+        transcriptsList.innerHTML = '<div style="opacity:0.7; text-align: center; padding: 40px;">No recordings found</div>';
+        return;
+      }
+      
+      // Only show files that have transcripts
+      const filesWithTranscripts = files.filter(filename => {
+        return checkTranscriptionStatus(filename);
+      });
+      
+      if (filesWithTranscripts.length === 0) {
+        transcriptsList.innerHTML = '<div style="opacity:0.7; text-align: center; padding: 40px;">No transcribed recordings found. Please transcribe some recordings first.</div>';
+        return;
+      }
+      
+      filesWithTranscripts.forEach(filename => {
+        const item = createEditTranscriptItem(filename);
+        if (item) {
+          transcriptsList.appendChild(item);
+        }
+      });
+      
+      // Apply current filter
+      const filterSelect = document.getElementById('edit-filter');
+      if (filterSelect) {
+        filterEditTranscripts(filterSelect.value);
+      }
+    }
+    
+    // Initialize edit functionality
+    document.addEventListener('DOMContentLoaded', () => {
+      const filterSelect = document.getElementById('edit-filter');
+      const summarizeSelectedBtn = document.getElementById('summarize-selected-btn');
+      
+      if (filterSelect) {
+        filterSelect.onchange = (e) => {
+          filterEditTranscripts(e.target.value);
+        };
+      }
+      
+      if (summarizeSelectedBtn) {
+        summarizeSelectedBtn.onclick = async () => {
+          const selectedArray = Array.from(selectedTranscripts);
+          for (const filename of selectedArray) {
+            const item = document.querySelector(`[data-filename="${filename}"]`);
+            if (item) {
+              await summarizeTranscript(filename, item);
+            }
+          }
+          selectedTranscripts.clear();
+          updateSummarizeButton();
+        };
+      }
+    });
+  </script>
+</body>
+</html>

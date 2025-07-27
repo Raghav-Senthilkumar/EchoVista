@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link rel="stylesheet" href="style.css">
+  </head>
+  <body>
+    <div class="overlay">
+      <button id="closeBtn" class="icon-btn close-btn" title="Close">
+        <!-- Close SVG icon -->
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <line x1="6" y1="6" x2="18" y2="18" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+          <line x1="18" y1="6" x2="6" y2="18" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </button>
+      <button id="startBtn" class="icon-btn" title="Start Recording">
+        <!-- Record SVG icon -->
+        <svg width="36" height="36" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="16" cy="16" r="12" fill="#ff3b30"/>
+        </svg>
+      </button>
+      <button id="stopBtn" class="icon-btn" title="Stop Recording">
+        <!-- Stop SVG icon -->
+        <svg width="36" height="36" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="8" y="8" width="16" height="16" rx="4" fill="#fff" stroke="#ff3b30" stroke-width="2"/>
+        </svg>
+      </button>
+      <button id="manageBtn" class="icon-btn manage-btn" title="Manage Recordings">
+        <!-- Manage SVG icon (folder) -->
+        <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="4" y="10" width="24" height="14" rx="3" fill="#ffd700" stroke="#fff" stroke-width="2"/>
+          <rect x="4" y="6" width="10" height="6" rx="2" fill="#fff8dc" stroke="#fff" stroke-width="2"/>
+        </svg>
+      </button>
+    </div>
+    <script src="renderer.js"></script>
+  </body>
+</html>
