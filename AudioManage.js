@@ -21,10 +21,83 @@ function createAudioItem(filename) {
   const audioInfo = document.createElement('div');
   audioInfo.className = 'audio-info';
 
-  // Display the audio file name as the title
+
+  // Display the audio file name as the title (with inline edit)
   const title = document.createElement('div');
   title.className = 'audio-title';
   title.textContent = filename;
+
+  // Inline edit: click to edit
+  title.style.cursor = 'pointer';
+  title.title = 'Click to rename';
+  title.addEventListener('click', function handleEdit() {
+    // Prevent multiple inputs
+    if (title.querySelector('input')) return;
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.value = filename.replace(/\.mp3$/i, '');
+    input.style.fontSize = '13px';
+    input.style.fontFamily = 'inherit';
+    input.style.width = '90%';
+    input.style.border = '1px solid #e5e7eb';
+    input.style.borderRadius = '5px';
+    input.style.padding = '2px 4px';
+    input.style.margin = '0';
+    input.style.background = '#fff';
+    input.style.color = '#1F2937';
+    input.style.outline = 'none';
+    input.style.boxSizing = 'border-box';
+    input.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') input.blur();
+      if (e.key === 'Escape') {
+        input.replaceWith(titleText);
+      }
+    });
+    input.addEventListener('blur', function() {
+      let newName = input.value.trim();
+      if (!newName || newName === filename.replace(/\.mp3$/i, '')) {
+        input.replaceWith(titleText);
+        return;
+      }
+      // Sanitize: remove slashes, etc.
+      newName = newName.replace(/[\\/:*?"<>|]/g, '');
+      const newFilename = newName + '.mp3';
+      const oldPath = path.join(recordingsDir, filename);
+      const newPath = path.join(recordingsDir, newFilename);
+      if (fs.existsSync(newPath)) {
+        alert('A recording with that name already exists.');
+        input.replaceWith(titleText);
+        return;
+      }
+      try {
+        fs.renameSync(oldPath, newPath);
+        // Also rename peaks cache if exists
+        const oldPeaks = path.join(recordingsDir, filename + '.peaks.json');
+        const newPeaks = path.join(recordingsDir, newFilename + '.peaks.json');
+        if (fs.existsSync(oldPeaks)) fs.renameSync(oldPeaks, newPeaks);
+        // Also rename transcription if exists
+        const transcriptionDir = path.join(__dirname, 'transcription');
+        const oldTxt = path.join(transcriptionDir, filename.replace(/\.mp3$/i, '.txt'));
+        const newTxt = path.join(transcriptionDir, newName + '.txt');
+        if (fs.existsSync(oldTxt)) fs.renameSync(oldTxt, newTxt);
+        // Update UI
+        titleText.textContent = newFilename;
+        item.setAttribute('data-filename', newFilename);
+        // Optionally, reload the list to update order
+        if (typeof loadAudioList === 'function') loadAudioList();
+      } catch (err) {
+        alert('Rename failed.');
+      }
+      input.replaceWith(titleText);
+    });
+    // Replace title with input
+    const titleText = document.createElement('div');
+    titleText.className = 'audio-title';
+    titleText.textContent = filename;
+    title.replaceWith(input);
+    input.focus();
+    input.select();
+  });
 
   // Calculate the "recording number" (based on file index in sorted list)
   const recordingNumber = document.createElement('div');
@@ -72,28 +145,52 @@ function createAudioItem(filename) {
   downloadBtn.setAttribute('aria-label', 'Download');
   downloadBtn.innerHTML = '⬇';
   downloadBtn.onclick = () => {
-    const { shell } = require('electron');
+    const { shell, ipcRenderer } = require('electron');
     shell.showItemInFolder(path.join(recordingsDir, filename));
   };
 
   // Delete button to remove the audio file and related cached data
   const deleteBtn = document.createElement('button');
-  deleteBtn.className = 'action-btn';
-  deleteBtn.setAttribute('aria-label', 'Delete');
-  deleteBtn.innerHTML = '🗑';
-  deleteBtn.onclick = () => {
-    if (confirm(`Delete "${filename}"?`)) {
+deleteBtn.className = 'action-btn';
+deleteBtn.setAttribute('aria-label', 'Delete');
+deleteBtn.innerHTML = '🗑';
+
+deleteBtn.onclick = async () => {
+  if (confirm(`Delete "${filename}"?`)) {
+    try {
       // Delete the audio file
-      fs.unlinkSync(path.join(recordingsDir, filename));
-      // Also delete waveform peaks cache if exists
+      const audioPath = path.join(recordingsDir, filename);
+      if (fs.existsSync(audioPath)) {
+        fs.unlinkSync(audioPath);
+      }
+
+      // Delete waveform peaks cache
       const peaksPath = path.join(recordingsDir, filename + '.peaks.json');
       if (fs.existsSync(peaksPath)) {
         fs.unlinkSync(peaksPath);
       }
-      // Remove the item from the UI
+
+      // Delete corresponding transcription file if it exists
+      const transcriptionDir = path.join(__dirname, 'transcription'); // adjust if different
+      const txtFile = filename.replace(/\.mp3$/i, '.txt');
+      const txtPath = path.join(transcriptionDir, txtFile);
+      if (fs.existsSync(txtPath)) {
+        fs.unlinkSync(txtPath);
+        await ipcRenderer.invoke('decrement-transcript-count');
+      }
+
+      // Remove from UI
       item.remove();
+
+      // Update recording count
+      await ipcRenderer.invoke('decrement-recording-count');
+    } catch (err) {
+      console.error('Error deleting files:', err);
+      alert('Something went wrong while deleting the recording.');
     }
-  };
+  }
+};
+
 
   // Append all buttons to the action buttons container
   actionButtons.appendChild(playBtn);

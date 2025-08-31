@@ -1,8 +1,9 @@
-const { remote, ipcRenderer } = require('electron');
+const { remote, ipcRenderer, shell } = require('electron');
 const fs = require('fs');
 const path = require('path');
 const { execFile } = require('child_process');
 const ffmpegPath = require('ffmpeg-static');
+const mp3Duration = require('mp3-duration');
 
 let micRecorder, systemRecorder;
 let micChunks = [], systemChunks = [];
@@ -14,16 +15,9 @@ const manageBtn = document.getElementById('manageBtn');
 const managePanel = document.getElementById('managePanel');
 const closePanelBtn = document.getElementById('closePanelBtn');
 const recordingsList = document.getElementById('recordingsList');
-const { shell } = require('electron');
 
 const fsPromises = fs.promises;
 const recordingsDir = path.join(__dirname, 'recordings');
-
-const micMp3 = path.join(__dirname, 'input', 'mic.mp3');
-const systemMp3 = path.join(__dirname, 'output', 'system.mp3');
-const finalMp3 = path.join(__dirname, 'recordings', 'final_mix.mp3');
-const micWav = path.join(__dirname, 'input', 'mic.wav');
-const systemWav = path.join(__dirname, 'output', 'system.wav');
 
 const setRecordingState = (isRecording) => {
   if (isRecording) {
@@ -40,6 +34,9 @@ function getTimestamp() {
 
 let currentTimestamp = '';
 
+// Initially disable Stop button since not recording yet
+stopBtn.disabled = true;
+
 closeBtn.onclick = () => {
   try {
     remote.app.quit();
@@ -48,15 +45,22 @@ closeBtn.onclick = () => {
       const win = remote.getCurrentWindow();
       win.close();
     } catch (e2) {
-      // As a last resort, forcefully terminate the process
       process.exit(0);
     }
   }
 };
 
 startBtn.onclick = async () => {
+  if (micRecorder && micRecorder.state === 'recording') {
+    return; // Already recording
+  }
+
+  startBtn.disabled = true;
+  stopBtn.disabled = false;
+
   currentTimestamp = getTimestamp();
   setRecordingState(true);
+
   const devices = await navigator.mediaDevices.enumerateDevices();
   const audioInputs = devices.filter(d => d.kind === 'audioinput');
   const systemDevice = audioInputs.find(d =>
@@ -64,18 +68,23 @@ startBtn.onclick = async () => {
   );
   if (!systemDevice) {
     setRecordingState(false);
+    startBtn.disabled = false;
+    stopBtn.disabled = true;
     return;
   }
+
   const micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
   micRecorder = new MediaRecorder(micStream);
   micChunks = [];
   micRecorder.ondataavailable = e => micChunks.push(e.data);
+
   const systemStream = await navigator.mediaDevices.getUserMedia({
     audio: { deviceId: systemDevice.deviceId }
   });
   systemRecorder = new MediaRecorder(systemStream);
   systemChunks = [];
   systemRecorder.ondataavailable = e => systemChunks.push(e.data);
+
   micRecorder.start();
   systemRecorder.start();
   setRecordingState(true);
@@ -83,68 +92,86 @@ startBtn.onclick = async () => {
 
 stopBtn.onclick = async () => {
   if (!micRecorder || !systemRecorder) return;
+
+  stopBtn.disabled = true;
+  startBtn.disabled = false;
+
   setRecordingState(false);
+
   const micStopped = new Promise(resolve => micRecorder.onstop = resolve);
   const sysStopped = new Promise(resolve => systemRecorder.onstop = resolve);
   micRecorder.stop();
   systemRecorder.stop();
   await Promise.all([micStopped, sysStopped]);
 
-  // Use timestamped filenames
   const micMp3 = path.join(__dirname, 'input', `mic_${currentTimestamp}.mp3`);
   const systemMp3 = path.join(__dirname, 'output', `system_${currentTimestamp}.mp3`);
-  const finalMp3 = path.join(__dirname, 'recordings', `final_mix_${currentTimestamp}.mp3`);
+  const finalMp3 = path.join(recordingsDir, `final_mix_${currentTimestamp}.mp3`);
   const micWav = path.join(__dirname, 'input', `mic_${currentTimestamp}.wav`);
   const systemWav = path.join(__dirname, 'output', `system_${currentTimestamp}.wav`);
 
-  // Save mic.wav and system.wav temporarily in their folders
   const micBlob = new Blob(micChunks, { type: 'audio/wav' });
   const micBuf = Buffer.from(await micBlob.arrayBuffer());
   fs.writeFileSync(micWav, micBuf);
+
   const sysBlob = new Blob(systemChunks, { type: 'audio/wav' });
   const sysBuf = Buffer.from(await sysBlob.arrayBuffer());
   fs.writeFileSync(systemWav, sysBuf);
 
-  // Convert mic.wav → input/mic_TIMESTAMP.mp3
+  // Convert mic.wav to mp3
   await new Promise((resolve) => {
-  execFile(ffmpegPath, ['-y', '-i', micWav, micMp3], (err) => {
-    if (err) console.error('Mic MP3 conversion failed:', err);
+    execFile(ffmpegPath, ['-y', '-i', micWav, micMp3], (err) => {
+      if (err) console.error('Mic MP3 conversion failed:', err);
       resolve();
     });
   });
 
-  // Convert system.wav → output/system_TIMESTAMP.mp3
+  // Convert system.wav to mp3
   await new Promise((resolve) => {
-  execFile(ffmpegPath, ['-y', '-i', systemWav, systemMp3], (err) => {
-    if (err) console.error('System MP3 conversion failed:', err);
+    execFile(ffmpegPath, ['-y', '-i', systemWav, systemMp3], (err) => {
+      if (err) console.error('System MP3 conversion failed:', err);
       resolve();
     });
   });
 
-  // Mix mic.wav + system.wav → recordings/final_mix_TIMESTAMP.mp3
+  // Mix mic.wav + system.wav into final_mix.mp3
   await new Promise((resolve) => {
-  execFile(ffmpegPath, [
-    '-y',
-    '-i', micWav,
-    '-i', systemWav,
-    '-filter_complex', 'amix=inputs=2:duration=longest',
-    '-c:a', 'libmp3lame',
-    finalMp3
-  ], (err) => {
+    execFile(ffmpegPath, [
+      '-y',
+      '-i', micWav,
+      '-i', systemWav,
+      '-filter_complex', 'amix=inputs=2:duration=longest',
+      '-c:a', 'libmp3lame',
+      finalMp3
+    ], (err) => {
+      if (err) console.error('Mixing failed:', err);
+      resolve();
+    });
+  });
+
+  // Delete temp wav files
+  try { fs.unlinkSync(micWav); } catch {}
+  try { fs.unlinkSync(systemWav); } catch {}
+
+  await ipcRenderer.invoke('increment-recording-count');
+  
+  await ipcRenderer.invoke('increment-recordingsToday-count');
+
+  // Get duration of final mixed mp3 asynchronously using mp3-duration
+  mp3Duration(finalMp3, async (err, duration) => {
     if (err) {
-      console.error('Mixing failed:', err);
-      }
-      resolve();
-    });
-  });
+      console.error('Failed to get MP3 duration:', err);
+      return;
+    }
+    console.log(`Final mixed MP3 duration: ${duration} seconds`);
 
-  // Delete the temporary wav files
-  try {
-    fs.unlinkSync(micWav);
-  } catch (e) {}
-  try {
-    fs.unlinkSync(systemWav);
-  } catch (e) {}
+    // Send duration to main process
+    await ipcRenderer.invoke('increment-time-count', duration);
+
+    // Optional: Update total duration display in UI if you want
+    // const totalDuration = await ipcRenderer.invoke('get-total-duration');
+    // document.getElementById('totalDurationDisplay').textContent = `Total Duration: ${formatDuration(totalDuration)}`;
+  });
 };
 
 manageBtn.onclick = () => {
@@ -165,8 +192,8 @@ async function populateRecordingsList() {
   } catch (e) {}
   if (files.length === 0) {
     recordingsList.innerHTML = '<li style="text-align:center;opacity:0.7;">No recordings found</li>';
-      return;
-    }
+    return;
+  }
   for (const file of files) {
     const li = document.createElement('li');
     const nameSpan = document.createElement('span');
@@ -175,7 +202,7 @@ async function populateRecordingsList() {
     li.appendChild(nameSpan);
     const actions = document.createElement('div');
     actions.className = 'recording-actions';
-    // Download
+    // Show in Finder
     const downloadBtn = document.createElement('button');
     downloadBtn.className = 'action-btn';
     downloadBtn.title = 'Show in Finder';
@@ -230,3 +257,4 @@ function startRename(li, oldName, nameSpan) {
   };
   input.onblur = () => populateRecordingsList();
 }
+
